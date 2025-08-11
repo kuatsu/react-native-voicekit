@@ -2,7 +2,7 @@ import Foundation
 
 @objc(VoiceKitEventEmitter)
 class VoiceKitEventEmitter: RCTEventEmitter {
-  public static var shared: VoiceKitEventEmitter!
+  static var shared: VoiceKitEventEmitter!
 
   override init() {
     super.init()
