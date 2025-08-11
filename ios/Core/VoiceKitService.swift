@@ -27,6 +27,11 @@ class VoiceKitService: NSObject, SFSpeechRecognizerDelegate {
     }
   }
 
+  // Store original audio session configuration for restoration
+  private var originalAudioCategory: AVAudioSession.Category?
+  private var originalAudioMode: AVAudioSession.Mode?
+  private var originalAudioOptions: AVAudioSession.CategoryOptions?
+
   weak var delegate: VoiceKitServiceDelegate?
 
   override init() {
@@ -59,6 +64,12 @@ class VoiceKitService: NSObject, SFSpeechRecognizerDelegate {
 
     // Configure audio session
     let audioSession = AVAudioSession.sharedInstance()
+
+    // Save original audio session configuration for restoration
+    originalAudioCategory = audioSession.category
+    originalAudioMode = audioSession.mode
+    originalAudioOptions = audioSession.categoryOptions
+
     try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
     try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
 
@@ -127,6 +138,10 @@ class VoiceKitService: NSObject, SFSpeechRecognizerDelegate {
     audioEngine.inputNode.removeTap(onBus: 0)
     recognitionRequest = nil
     recognitionTask = nil
+    isListening = false
+
+    // Restore original audio session configuration
+    restoreAudioSession()
 
     if let error = error as NSError?, error.domain == "kAFAssistantErrorDomain" && error.code == 1110 {
       Logger.log(level: .debug, message: "No speech detected")
@@ -154,6 +169,31 @@ class VoiceKitService: NSObject, SFSpeechRecognizerDelegate {
     recognitionTask?.cancel()
     recognitionTask = nil
     isListening = false
+
+    // Restore original audio session configuration
+    restoreAudioSession()
+  }
+
+  private func restoreAudioSession() {
+    guard let originalCategory = originalAudioCategory,
+          let originalMode = originalAudioMode,
+          let originalOptions = originalAudioOptions else {
+      Logger.log(level: .debug, message: "No original audio session configuration to restore")
+      return
+    }
+
+    do {
+      let audioSession = AVAudioSession.sharedInstance()
+      try audioSession.setCategory(originalCategory, mode: originalMode, options: originalOptions)
+      Logger.log(level: .debug, message: "Audio session restored to original configuration")
+    } catch {
+      Logger.log(level: .error, message: "Failed to restore audio session: \(error)")
+    }
+
+    // Clear the stored configuration
+    originalAudioCategory = nil
+    originalAudioMode = nil
+    originalAudioOptions = nil
   }
 
   func isAvailable() -> Bool {
