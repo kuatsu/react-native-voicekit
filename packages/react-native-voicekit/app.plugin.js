@@ -1,1 +1,1 @@
-module.exports = require('./dist/commonjs/expo-plugin/withVoiceKit.js');
+module.exports = require('./dist/commonjs/expo-plugin/index.js');

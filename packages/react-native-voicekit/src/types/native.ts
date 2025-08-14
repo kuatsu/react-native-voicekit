@@ -1,6 +1,6 @@
-import type { VoiceModelDownloadStatus, VoiceStartListeningOptions } from '.';
+import type { VoiceModelDownloadStatus, VoiceStartListeningOptions } from './main';
 
-export enum VoiceErrorCode {
+export enum NativeVoiceErrorCode {
   SPEECH_RECOGNIZER_NOT_AVAILABLE = 'ERR_SPEECH_RECOGNIZER_NOT_AVAILABLE',
   RECORDING_START_FAILED = 'ERR_RECORDING_START_FAILED',
   RECOGNITION_FAILED = 'ERR_RECOGNITION_FAILED',
@@ -11,7 +11,7 @@ export enum VoiceErrorCode {
   UNKNOWN = 'ERR_UNKNOWN',
 }
 
-export default interface NativeRNVoiceKit {
+export interface NativeVoiceKit {
   startListening: (options: Required<VoiceStartListeningOptions>) => Promise<void>;
   stopListening: () => Promise<void>;
   isSpeechRecognitionAvailable: () => Promise<boolean>;

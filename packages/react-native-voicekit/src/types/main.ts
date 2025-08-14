@@ -7,9 +7,9 @@ export enum VoiceEvent {
   Error = 'error',
 }
 
-import VoiceError from '../utils/VoiceError';
+import type VoiceError from '../utils/voice-error';
 
-export interface VoiceEventMap extends Record<VoiceEvent, any[]> {
+export interface VoiceEventMap extends Record<VoiceEvent, unknown[]> {
   [VoiceEvent.Result]: [string];
   [VoiceEvent.PartialResult]: [string];
   [VoiceEvent.AvailabilityChange]: [boolean];

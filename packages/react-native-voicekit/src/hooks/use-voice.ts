@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import RNVoiceKit from '../RNVoiceKit';
-import { VoiceEvent, type VoiceStartListeningOptions } from '../types';
+import RNVoiceKit from '../voice-kit';
+import { VoiceEvent, type VoiceStartListeningOptions } from '../types/main';
 
 interface UseVoiceProps extends VoiceStartListeningOptions {
   /** Whether to update the transcript on partial results. Defaults to false. */

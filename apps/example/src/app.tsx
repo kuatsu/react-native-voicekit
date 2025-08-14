@@ -95,40 +95,35 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#f0f0f0',
-  },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
-  },
-  dropdown: {
-    width: '100%',
-  },
   button: {
-    width: '100%',
-    padding: 10,
     backgroundColor: 'lightblue',
     borderRadius: 5,
-  },
-  disabledButton: {
-    backgroundColor: '#ccc',
+    padding: 10,
+    width: '100%',
   },
   buttonText: {
     textAlign: 'center',
   },
-  resultTextarea: {
+  container: {
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    flex: 1,
+    gap: 10,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+  },
+  dropdown: {
     width: '100%',
-    height: 100,
-    borderWidth: 1,
+  },
+  resultTextarea: {
     borderColor: '#aaa',
     borderRadius: 10,
+    borderWidth: 1,
+    height: 100,
     padding: 10,
+    width: '100%',
   },
 });

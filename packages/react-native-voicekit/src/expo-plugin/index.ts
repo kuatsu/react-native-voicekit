@@ -1,8 +1,5 @@
-import { AndroidConfig, type ConfigPlugin, createRunOncePlugin, withInfoPlist } from '@expo/config-plugins';
+import { AndroidConfig, type ConfigPlugin, withInfoPlist } from '@expo/config-plugins';
 import type { RNVoiceKitConfigPluginOptions } from './types';
-
-// from lib directory, package.json is three levels up
-const pkg = require('../../../package.json');
 
 const DEFAULT_MICROPHONE_PERMISSION = 'Allow $(PRODUCT_NAME) to access the microphone to recognize your voice.';
 const DEFAULT_SPEECH_RECOGNITION_PERMISSION = 'Allow $(PRODUCT_NAME) to securely recognize your voice.';
@@ -34,10 +31,10 @@ const withAndroidPermissions: ConfigPlugin = (config) => {
   ]);
 };
 
-const withVoiceKit: ConfigPlugin<RNVoiceKitConfigPluginOptions | void> = (config, props = {}) => {
+const withVoiceKit: ConfigPlugin<RNVoiceKitConfigPluginOptions> = (config, props = {}) => {
   config = withIosPermissions(config, props ?? {});
   config = withAndroidPermissions(config);
   return config;
 };
 
-export default createRunOncePlugin(withVoiceKit, pkg.name, pkg.version);
+export default withVoiceKit;

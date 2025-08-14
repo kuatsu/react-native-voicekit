@@ -1,4 +1,4 @@
-export interface RNVoiceKitConfigPluginOptions {
+export type RNVoiceKitConfigPluginOptions = {
   /**
    * Custom `NSSpeechRecognitionUsageDescription` message.
    */
@@ -7,4 +7,4 @@ export interface RNVoiceKitConfigPluginOptions {
    * Custom `NSMicrophoneUsageDescription` message.
    */
   microphonePermission?: string | false;
-}
+} | undefined

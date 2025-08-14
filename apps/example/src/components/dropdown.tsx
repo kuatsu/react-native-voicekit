@@ -10,6 +10,7 @@ interface DropdownProps<T>
   data: Array<{ label: string; value: T }>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Dropdown: React.FC<DropdownProps<any>> = ({
   style,
   itemTextStyle,
@@ -34,7 +35,7 @@ const Dropdown: React.FC<DropdownProps<any>> = ({
         style={[styles.dropdown, isFocus && { borderColor: 'lightblue' }, style]}
         selectedTextStyle={[styles.dropdownSelectedText, selectedTextStyle]}
         itemTextStyle={[styles.dropdownItemText, itemTextStyle]}
-        placeholder={!isFocus ? placeholder : '...'}
+        placeholder={isFocus ? '...' : placeholder}
         onFocus={() => {
           onFocus?.();
           setIsFocus(true);
@@ -57,19 +58,19 @@ const styles = StyleSheet.create({
   container: {
     gap: 5,
   },
-  label: {
-    fontSize: 14,
-  },
   dropdown: {
-    borderWidth: 1,
     borderColor: '#aaa',
     borderRadius: 10,
+    borderWidth: 1,
     padding: 10,
+  },
+  dropdownItemText: {
+    fontSize: 14,
   },
   dropdownSelectedText: {
     fontSize: 14,
   },
-  dropdownItemText: {
+  label: {
     fontSize: 14,
   },
 });

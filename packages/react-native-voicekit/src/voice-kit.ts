@@ -1,63 +1,48 @@
-import type NativeRNVoiceKit from './types/native';
+import type { NativeVoiceKit } from './types/native';
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
-import RNVoiceError from './utils/VoiceError';
-import { VoiceErrorCode } from './types/native';
-import { VoiceEvent, VoiceMode } from './types';
-import { VoiceModelDownloadStatus, type VoiceEventMap, type VoiceStartListeningOptions } from './types';
-
-const LINKING_ERROR =
-  `The package 'react-native-voicekit' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
+import RNVoiceError from './utils/voice-error';
+import { NativeVoiceErrorCode } from './types/native';
+import { VoiceEvent, VoiceMode } from './types/main';
+import { VoiceModelDownloadStatus, type VoiceEventMap, type VoiceStartListeningOptions } from './types/main';
+import type VoiceError from './utils/voice-error';
+import { LINKING_ERROR } from './utils/constants';
+import { createProxiedNativeModule } from './utils/native';
 
 // proxy NativeModules.VoiceKit to catch any errors thrown by the native module and wrap them in a VoiceError
-const nativeInstance: NativeRNVoiceKit = NativeModules.VoiceKit
-  ? new Proxy(NativeModules.VoiceKit, {
-      get(target: NativeRNVoiceKit, prop: keyof NativeRNVoiceKit) {
-        const originalFunction = target[prop];
-        if (typeof originalFunction === 'function') {
-          return async (...args: any[]) => {
-            try {
-              // @ts-expect-error - we can't know the types of the functions and their arguments
-              return await originalFunction(...args);
-            } catch (error: any) {
-              if (error?.code && Object.values(VoiceErrorCode).includes(error.code)) {
-                throw new RNVoiceError(error?.message || '', error.code as VoiceErrorCode);
-              } else {
-                throw new RNVoiceError('Unknown error', VoiceErrorCode.UNKNOWN, error);
-              }
-            }
-          };
-        }
-        return originalFunction;
+const nativeInstance: NativeVoiceKit = NativeModules.VoiceKit
+  ? createProxiedNativeModule(NativeModules.VoiceKit)
+  : (new Proxy(
+    {},
+    {
+      get() {
+        throw new Error(LINKING_ERROR);
       },
-    })
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
+    }
+  ));
 
 const nativeEmitter = new NativeEventEmitter(NativeModules.VoiceKitEventEmitter);
 
 class RNVoiceKit {
-  private listeners: Partial<Record<VoiceEvent, ((...args: VoiceEventMap[VoiceEvent]) => void)[]>> = {};
+  private listeners: Partial<{
+    [K in VoiceEvent]: ((...arguments_: VoiceEventMap[K]) => void)[]
+  }> = {};
 
   constructor() {
     for (const event of Object.values(VoiceEvent)) {
-      nativeEmitter.addListener(`RNVoiceKit.${event}`, (...args) => {
-        if (this.listeners[event]) {
+      nativeEmitter.addListener(`RNVoiceKit.${event}`, (...arguments_) => {
+        const eventListeners = this.listeners[event];
+        if (eventListeners) {
           if (event === VoiceEvent.Error) {
             // Convert the error map back to a VoiceError object
-            const errorData = args[0] as { code: VoiceErrorCode; message: string };
+            const errorData = arguments_[0] as { code: NativeVoiceErrorCode; message: string };
             const voiceError = new RNVoiceError(errorData.message, errorData.code);
-            this.listeners[event]?.forEach((listener) => listener(voiceError));
+            for (const listener of eventListeners) {
+              (listener as (error: VoiceError) => void)(voiceError);
+            }
           } else {
-            this.listeners[event]?.forEach((listener) => listener(...args));
+            for (const listener of eventListeners) {
+              (listener as (...arguments__: unknown[]) => void)(...arguments_);
+            }
           }
         }
       });
@@ -122,7 +107,8 @@ class RNVoiceKit {
    */
   async isOnDeviceModelInstalled(locale: string): Promise<boolean> {
     if (Platform.OS === 'ios') {
-      return (await this.getSupportedLocales()).includes(locale);
+      const supportedLocales = await this.getSupportedLocales();
+      return supportedLocales.includes(locale);
     }
 
     return await nativeInstance.isOnDeviceModelInstalled(locale);
@@ -142,26 +128,28 @@ class RNVoiceKit {
     locale: string
   ): Promise<{ status: VoiceModelDownloadStatus; progressAvailable: boolean }> {
     if (Platform.OS === 'ios') {
-      if ((await this.getSupportedLocales()).includes(locale)) {
+      const supportedLocales = await this.getSupportedLocales();
+      if (supportedLocales.includes(locale)) {
         return { status: VoiceModelDownloadStatus.Started, progressAvailable: false };
       } else {
-        throw new RNVoiceError('Locale is not supported', VoiceErrorCode.INVALID_STATE); // TODO: better code
+        throw new RNVoiceError('Locale is not supported', NativeVoiceErrorCode.INVALID_STATE); // TODO: better code
       }
     }
 
     return await nativeInstance.downloadOnDeviceModel(locale);
   }
 
-  addListener<T extends VoiceEvent>(event: T, listener: (...args: VoiceEventMap[T]) => void) {
+  addListener<T extends VoiceEvent>(event: T, listener: (...arguments_: VoiceEventMap[T]) => void) {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
-    this.listeners[event].push(listener as (...args: any[]) => void);
+    this.listeners[event].push(listener);
   }
 
-  removeListener<T extends VoiceEvent>(event: T, listener: (...args: VoiceEventMap[T]) => void) {
-    if (this.listeners[event]) {
-      this.listeners[event] = this.listeners[event].filter((l) => l !== listener);
+  removeListener<T extends VoiceEvent>(event: T, listener: (...arguments_: VoiceEventMap[T]) => void) {
+    const eventListeners = this.listeners[event];
+    if (eventListeners) {
+      this.listeners[event] = eventListeners.filter((l) => l !== listener) as typeof eventListeners;
     }
   }
 }
