@@ -52,6 +52,13 @@ class VoiceKitService(private val context: ReactApplicationContext) {
       .emit(eventName, params)
   }
 
+  private fun createErrorMap(error: VoiceError): WritableMap {
+    return Arguments.createMap().apply {
+      putString("code", error.code)
+      putString("message", error.message)
+    }
+  }
+
   private fun muteRecognizerBeep() {
     if (audioManager == null) {
       audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -92,7 +99,7 @@ class VoiceKitService(private val context: ReactApplicationContext) {
 
     if (isListening) {
       Log.w(TAG, "Already listening, aborting startListening")
-      sendEvent("RNVoiceKit.error", VoiceError.InvalidState)
+      sendEvent("RNVoiceKit.error", createErrorMap(VoiceError.InvalidState))
       return
     }
 
@@ -149,7 +156,7 @@ class VoiceKitService(private val context: ReactApplicationContext) {
   fun stopListening() {
     if (!isListening) {
       Log.w(TAG, "Not listening, aborting stopListening")
-      sendEvent("RNVoiceKit.error", VoiceError.InvalidState)
+      sendEvent("RNVoiceKit.error", createErrorMap(VoiceError.InvalidState))
       return
     }
 
@@ -213,7 +220,7 @@ class VoiceKitService(private val context: ReactApplicationContext) {
 
         if (error != SpeechRecognizer.ERROR_NO_MATCH) {
           // An error occurred that we can't recover from, send error and notify of listening state change
-          sendEvent("RNVoiceKit.error", voiceError)
+          sendEvent("RNVoiceKit.error", createErrorMap(voiceError))
           isListening = false
 
           // Restore audio volume when erroring out

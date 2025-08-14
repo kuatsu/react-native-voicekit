@@ -43,7 +43,10 @@ class VoiceKit: NSObject, VoiceKitServiceDelegate {
   func onError(_ error: VoiceError) {
     VoiceKitEventEmitter.shared.sendEvent(
       withName: "RNVoiceKit.error",
-      body: error.message
+      body: [
+        "code": error.code,
+        "message": error.message,
+      ]
     )
   }
 

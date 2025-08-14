@@ -51,7 +51,14 @@ class RNVoiceKit {
     for (const event of Object.values(VoiceEvent)) {
       nativeEmitter.addListener(`RNVoiceKit.${event}`, (...args) => {
         if (this.listeners[event]) {
-          this.listeners[event]?.forEach((listener) => listener(...args));
+          if (event === VoiceEvent.Error) {
+            // Convert the error map back to a VoiceError object
+            const errorData = args[0] as { code: VoiceErrorCode; message: string };
+            const voiceError = new RNVoiceError(errorData.message, errorData.code);
+            this.listeners[event]?.forEach((listener) => listener(voiceError));
+          } else {
+            this.listeners[event]?.forEach((listener) => listener(...args));
+          }
         }
       });
     }

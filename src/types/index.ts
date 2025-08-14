@@ -7,13 +7,15 @@ export enum VoiceEvent {
   Error = 'error',
 }
 
+import VoiceError from '../utils/VoiceError';
+
 export interface VoiceEventMap extends Record<VoiceEvent, any[]> {
   [VoiceEvent.Result]: [string];
   [VoiceEvent.PartialResult]: [string];
   [VoiceEvent.AvailabilityChange]: [boolean];
   [VoiceEvent.ListeningStateChange]: [boolean];
   [VoiceEvent.ModelDownloadProgress]: [number];
-  [VoiceEvent.Error]: any[];
+  [VoiceEvent.Error]: [VoiceError];
 }
 
 export enum VoiceMode {
