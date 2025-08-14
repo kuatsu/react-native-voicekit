@@ -19,7 +19,7 @@ export default function App() {
   useEffect(() => {
     VoiceKit.getSupportedLocales().then((locales) => {
       setSupportedLocales(locales.sort());
-      setLocale((currentLocale) => (locales.includes(currentLocale) ? currentLocale : (locales[0] ?? 'en-US')));
+      setLocale((currentLocale) => (locales.includes(currentLocale) ? currentLocale : locales[0] ?? 'en-US'));
     });
   }, [locale]);
 

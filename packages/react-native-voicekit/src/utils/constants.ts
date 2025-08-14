@@ -1,4 +1,4 @@
-import { Platform } from "react-native";
+import { Platform } from 'react-native';
 
 export const LINKING_ERROR =
   `The package 'react-native-voicekit' doesn't seem to be linked. Make sure: \n\n` +

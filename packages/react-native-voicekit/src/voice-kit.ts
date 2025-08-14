@@ -11,20 +11,20 @@ import { createProxiedNativeModule } from './utils/native';
 // proxy NativeModules.VoiceKit to catch any errors thrown by the native module and wrap them in a VoiceError
 const nativeInstance: NativeVoiceKit = NativeModules.VoiceKit
   ? createProxiedNativeModule(NativeModules.VoiceKit)
-  : (new Proxy(
-    {},
-    {
-      get() {
-        throw new Error(LINKING_ERROR);
-      },
-    }
-  ));
+  : new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(LINKING_ERROR);
+        },
+      }
+    );
 
 const nativeEmitter = new NativeEventEmitter(NativeModules.VoiceKitEventEmitter);
 
 class RNVoiceKit {
   private listeners: Partial<{
-    [K in VoiceEvent]: ((...arguments_: VoiceEventMap[K]) => void)[]
+    [K in VoiceEvent]: ((...arguments_: VoiceEventMap[K]) => void)[];
   }> = {};
 
   constructor() {
