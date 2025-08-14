@@ -10,6 +10,6 @@ class VoiceKitEventEmitter: RCTEventEmitter {
   }
 
   override func supportedEvents() -> [String]! {
-    ["RNVoiceKit.result", "RNVoiceKit.partial-result", "RNVoiceKit.availability-change", "RNVoiceKit.listening-state-change", "RNVoiceKit.error"]
+    ["RNVoiceKit.result", "RNVoiceKit.partial-result", "RNVoiceKit.availability-change", "RNVoiceKit.listening-state-change", "RNVoiceKit.error", "RNVoiceKit.model-download-progress"]
   }
 }
