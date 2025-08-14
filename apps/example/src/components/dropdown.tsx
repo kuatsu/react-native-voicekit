@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle 
 import { Dropdown as DefaultDropdown } from 'react-native-element-dropdown';
 
 interface DropdownProps<T>
-  extends Omit<React.ComponentProps<typeof DefaultDropdown<T>>, 'data' | 'labelField' | 'valueField'> {
+  extends Omit<React.ComponentProps<typeof DefaultDropdown>, 'data' | 'labelField' | 'valueField'> {
   label?: string;
   containerStyle?: StyleProp<ViewStyle>;
   labelStyle?: StyleProp<TextStyle>;
