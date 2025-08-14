@@ -5,13 +5,11 @@ on:
       - master
     paths:
       - '.github/workflows/build-android.yml'
-      - 'android/**'
-      - 'example/android/**'
+      - '**/android/**'
   pull_request:
     paths:
       - '.github/workflows/build-android.yml'
-      - 'android/**'
-      - 'example/android/**'
+      - '**/android/**'
 jobs:
   build:
     name: Build Android example app
@@ -34,9 +32,14 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: Build package
+        run: yarn package build
       - name: Build app
-        run: './gradlew assembleDebug --no-daemon --build-cache'
-        working-directory: example/android
+        run: "rm -rf android && \
+          npx expo prebuild -p android && \
+          cd android && \
+          ./gradlew assembleDebug --no-daemon --build-cache"
+        working-directory: apps/example
       - name: Stop Gradle Daemon
         run: ./gradlew --stop
-        working-directory: example/android
+        working-directory: apps/example/android
