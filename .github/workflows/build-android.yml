@@ -32,6 +32,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+      - name: Build package
+        run: yarn package build
       - name: Build app
         run: "rm -rf android && \
           npx expo prebuild -p android && \
