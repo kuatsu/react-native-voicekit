@@ -31,8 +31,8 @@ jobs:
           set -o pipefail && xcodebuild \
           CC=clang CPLUSPLUS=clang++ LD=clang LDPLUSPLUS=clang++ \
           -derivedDataPath build -UseModernBuildSystem=YES \
-          -workspace RNCloudStorage.xcworkspace \
-          -scheme RNCloudStorage \
+          -workspace RNVoiceKit.xcworkspace \
+          -scheme RNVoiceKit \
           -sdk iphonesimulator \
           -configuration Debug \
           -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
