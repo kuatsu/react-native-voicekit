@@ -24,6 +24,8 @@ jobs:
         run: gem install xcpretty
       - name: Build package
         run: yarn package build
+      - name: Select Xcode
+        run: xcode-select --switch /Applications/Xcode_16.4.app
       - name: Build app
         run: "rm -rf ios && \
           npx expo prebuild -p ios && \
