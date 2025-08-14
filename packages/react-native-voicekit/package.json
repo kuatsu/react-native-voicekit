@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@expo/config-plugins": "^10.0.2",
+    "@react-native/babel-preset": "^0.81.0",
     "@release-it/conventional-changelog": "^5.0.0",
     "@types/react": "~19.0.10",
     "react": "19.0.0",
